@@ -1,15 +1,24 @@
 package org.example.security_session.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    /*
+    시큐리티 암호와 메소드: 암호화를 위한 메소드로 bean 등록을 해서 사용
+     */
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -24,11 +33,28 @@ public class SecurityConfig {
                  * 넓은 범위의 권한부터 좁은 범위의 권한으로 설정해야 한다.
                  */
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/", "/login").permitAll() // 시작 페이지, 로그인 페이지 조건 없이 접근 허용
+                        .requestMatchers("/","/loginProc","/login","/joinProc","/join").permitAll() // 시작 페이지, 로그인 페이지 조건 없이 접근 허용
                         .requestMatchers("/admin").hasRole("ADMIN") // admin page는 role = "ADMIN" 만 접근 허용
                         .requestMatchers("/my/**").hasAnyRole("ADMIN", "USER") // role 을 가진 경우 접근 허용
                         .anyRequest().authenticated() // 나머지 요청에 관해선 거부
                 );
+
+        /**
+         * 로그인 페이지 설정
+         * 서정해놓은 로그인 페이지의 경로를 설정
+         * -> 앞으로 어드민 경로에 들어갈 때 설정한 로그인 페이지로 리 다이렉션을 한다.
+         */
+        http
+                .formLogin((auth) -> auth.loginPage("/login")
+                        .loginProcessingUrl("/loginProc")
+                        .permitAll()
+                );
+
+        /**
+         * csrf 토큰이 있어야 로그인이 진행되는데 이번예제의 경우 csrf 토큰 없이 진행하기 위해 disacble
+         */
+        http
+                .csrf((auth) -> auth.disable());
 
         return http.build();
     }
