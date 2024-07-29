@@ -30,6 +30,23 @@ public class SecurityConfig {
                         .anyRequest().authenticated() // 나머지 요청에 관해선 거부
                 );
 
+        /**
+         * 로그인 페이지 설정
+         * 서정해놓은 로그인 페이지의 경로를 설정
+         * -> 앞으로 어드민 경로에 들어갈 때 설정한 로그인 페이지로 리 다이렉션을 한다.
+         */
+        http
+                .formLogin((auth) -> auth.loginPage("/login")
+                        .loginProcessingUrl("/loginProc")
+                        .permitAll()
+                );
+
+        /**
+         * csrf 토큰이 있어야 로그인이 진행되는데 이번예제의 경우 csrf 토큰 없이 진행하기 위해 disacble
+         */
+        http
+                .csrf((auth) -> auth.disable());
+
         return http.build();
     }
 
