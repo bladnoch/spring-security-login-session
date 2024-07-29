@@ -16,18 +16,22 @@ public class JoinService {
 
     public void joinProcess(JoinDTO request) {
         //db에 동일한 유저 이름을 가진 유저가 있는지 검증
-//        if (userRepository.existsByUsername(request.getUsername())) {
-//            return;
-//        }
+        if (userRepository.existsByUsername(request.getUsername())) {
+            return;
+        }
+
+
+//        UserEntity data = new UserEntity();
+//        data.setUsername(request.getUsername());
+//        data.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
+//        data.setRole("ROLE_ADMIN");
+//
+//        userRepository.save(data);
+
 
         String encodedPassword = bCryptPasswordEncoder.encode(request.getPassword());
 
-        UserEntity data = new UserEntity();
-        data.setUsername(request.getUsername());
-        data.setPassword(encodedPassword);
-        data.setRole("ROLE_ADMIN");
-
-        userRepository.save(data);
+        userRepository.save(new UserEntity(request.getUsername(),encodedPassword, "ROLE_ADMIN"));
 
     }
 }
