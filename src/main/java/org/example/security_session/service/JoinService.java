@@ -21,17 +21,17 @@ public class JoinService {
         }
 
 
-//        UserEntity data = new UserEntity();
-//        data.setUsername(request.getUsername());
-//        data.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
-//        data.setRole("ROLE_ADMIN");
+        UserEntity data = new UserEntity();
+        data.setUsername(request.getUsername());
+        data.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
+        data.setRole("ROLE_ADMIN");
+
+        userRepository.save(data);
+
+
+//        String encodedPassword = bCryptPasswordEncoder.encode(request.getPassword());
 //
-//        userRepository.save(data);
-
-
-        String encodedPassword = bCryptPasswordEncoder.encode(request.getPassword());
-
-        userRepository.save(new UserEntity(request.getUsername(),encodedPassword, "ROLE_ADMIN"));
+//        userRepository.save(new UserEntity(request.getUsername(),encodedPassword, "ROLE_ADMIN"));
 
     }
 }
