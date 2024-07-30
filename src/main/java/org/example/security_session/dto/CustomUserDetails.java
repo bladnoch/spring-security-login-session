@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -46,12 +47,11 @@ public class CustomUserDetails implements UserDetails {
             @Override
             public String getAuthority() {
 
-
                 return userEntity.getRole();
             }
         });
 
-        return null;
+        return collection;
     }
 
     @Override
