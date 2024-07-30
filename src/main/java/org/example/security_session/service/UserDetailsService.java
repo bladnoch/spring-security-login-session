@@ -1,46 +1,28 @@
 package org.example.security_session.service;
 
-import org.springframework.security.core.GrantedAuthority;
+import lombok.RequiredArgsConstructor;
+import org.example.security_session.domain.UserEntity;
+import org.example.security_session.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
-
 @Service
-public class UserDetailsService implements UserDetails {
-    @Override
-    public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
-    }
+@RequiredArgsConstructor
+public class CustomUserDetailsService implements UserDetailsService {
+
+    private final UserRepository userRepository;
 
     @Override
-    public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
-    }
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
-    }
+        UserEntity userData = userRepository.findByUsername(username);
 
-    @Override
-    public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
-    }
+        if (userData != null) {
+            return new CustomUserDetails(userData);
+        }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }
-
-    @Override
-    public String getPassword() {
-        return "";
-    }
-
-    @Override
-    public String getUsername() {
-        return "";
+        return null;
     }
 }
