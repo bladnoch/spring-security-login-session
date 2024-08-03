@@ -55,8 +55,8 @@ public class SecurityConfig {
          * 아래의 코드 작성을 하지 않을 경우 default로 enable 상태가 되기 때문에 토큰 검증 부분을 만들어 주어야 한다
          * ch.11에서 위의 설정을 변경함
          */
-        http
-                .csrf((auth) -> auth.disable());
+//        http
+//                .csrf((auth) -> auth.disable());
 
         // 다중 로그인 관리
         http
