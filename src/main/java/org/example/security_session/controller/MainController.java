@@ -16,6 +16,10 @@ public class MainController {
     @GetMapping("/")
     public String mainP(Model model) {
 
+        /*
+            로그인 진해 뒤 사용자 정보는 SecurityContextHoder에 의해 세션에 관리된다.
+         */
+
         // 로그인한 사용자의 아이디 가져오기
         String id = SecurityContextHolder.getContext().getAuthentication().getName();
 
