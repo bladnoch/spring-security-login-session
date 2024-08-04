@@ -3,9 +3,14 @@ package org.example.security_session.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -45,10 +50,14 @@ public class SecurityConfig {
          * -> 앞으로 어드민 경로에 들어갈 때 설정한 로그인 페이지로 리 다이렉션을 한다.
          */
         http
-                .formLogin((auth) -> auth.loginPage("/login")
-                        .loginProcessingUrl("/loginProc")
-                        .permitAll()
-                );
+                // httpBasic 방식
+                .httpBasic(Customizer.withDefaults());
+
+                // form login 방식
+//                .formLogin((auth) -> auth.loginPage("/login")
+//                        .loginProcessingUrl("/loginProc")
+//                        .permitAll()
+//                );
 
         /**
          * csrf 토큰이 있어야 로그인이 진행되는데 이번예제의 경우 csrf 토큰 없이 진행하기 위해 disacble
@@ -72,5 +81,26 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+    // inMemory 방식 유저 정보 저장
+    // 사용시 UserDetailsService를 주석처리 해야 사용 가능
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//
+//        UserDetails user1 = User.builder()
+//                .username("user1")
+//                .password(bCryptPasswordEncoder().encode("1234"))
+//                .roles("ADMIN")
+//                .build();
+//
+//        UserDetails user2 = User.builder()
+//                .username("user2")
+//                .password(bCryptPasswordEncoder().encode("1234"))
+//                .roles("USER")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(user1,user2);
+//
+//    }
 
 }
