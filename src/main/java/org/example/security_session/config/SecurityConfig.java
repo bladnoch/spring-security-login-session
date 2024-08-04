@@ -3,6 +3,7 @@ package org.example.security_session.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -49,10 +50,14 @@ public class SecurityConfig {
          * -> 앞으로 어드민 경로에 들어갈 때 설정한 로그인 페이지로 리 다이렉션을 한다.
          */
         http
-                .formLogin((auth) -> auth.loginPage("/login")
-                        .loginProcessingUrl("/loginProc")
-                        .permitAll()
-                );
+                // httpBasic 방식
+                .httpBasic(Customizer.withDefaults());
+
+                // form login 방식
+//                .formLogin((auth) -> auth.loginPage("/login")
+//                        .loginProcessingUrl("/loginProc")
+//                        .permitAll()
+//                );
 
         /**
          * csrf 토큰이 있어야 로그인이 진행되는데 이번예제의 경우 csrf 토큰 없이 진행하기 위해 disacble
