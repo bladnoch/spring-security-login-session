@@ -3,6 +3,8 @@ package org.example.security_session.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,6 +27,15 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    // 앞에 ROLE_을 추가하지 않아도 자동으로 추가함
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.withDefaultRolePrefix()
+                .role("C").implies("B")
+                .role("B").implies("A")
+                .build();
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -36,11 +47,20 @@ public class SecurityConfig {
                 /**
                  * 깔때기처럼 requestMathcers의 권한은 순서에 따라 주어지고 앞에서의 권한이 뒤어서도 적용되기 때문에
                  * 넓은 범위의 권한부터 좁은 범위의 권한으로 설정해야 한다.
+                 * 14강 이후는 계층 권한 방식을 통해 합수를 추가하여 계층 권한 방식을 간소화 한다.
                  */
+//                .authorizeHttpRequests((auth) -> auth
+//                        .requestMatchers("/","/loginProc","/login","/joinProc","/join").permitAll() // 시작 페이지, 로그인 페이지 조건 없이 접근 허용
+//                        .requestMatchers("/admin").hasRole("ADMIN") // admin page는 role = "ADMIN" 만 접근 허용
+//                        .requestMatchers("/my/**").hasAnyRole("ADMIN", "USER") // role 을 가진 경우 접근 허용
+//                        .anyRequest().authenticated() // 나머지 요청에 관해선 거부
+//                );
+                // 계층 권한 적용 방식
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/","/loginProc","/login","/joinProc","/join").permitAll() // 시작 페이지, 로그인 페이지 조건 없이 접근 허용
-                        .requestMatchers("/admin").hasRole("ADMIN") // admin page는 role = "ADMIN" 만 접근 허용
-                        .requestMatchers("/my/**").hasAnyRole("ADMIN", "USER") // role 을 가진 경우 접근 허용
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/").hasAnyRole("A")
+                        .requestMatchers("/manager").hasAnyRole("B")
+                        .requestMatchers("/manager").hasAnyRole("C")
                         .anyRequest().authenticated() // 나머지 요청에 관해선 거부
                 );
 
@@ -84,23 +104,30 @@ public class SecurityConfig {
 
     // inMemory 방식 유저 정보 저장
     // 사용시 UserDetailsService를 주석처리 해야 사용 가능
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//
-//        UserDetails user1 = User.builder()
-//                .username("user1")
-//                .password(bCryptPasswordEncoder().encode("1234"))
-//                .roles("ADMIN")
-//                .build();
-//
-//        UserDetails user2 = User.builder()
-//                .username("user2")
-//                .password(bCryptPasswordEncoder().encode("1234"))
-//                .roles("USER")
-//                .build();
-//
-//        return new InMemoryUserDetailsManager(user1,user2);
-//
-//    }
+    @Bean
+    public UserDetailsService userDetailsService() {
+
+        UserDetails user1 = User.builder()
+                .username("user1")
+                .password(bCryptPasswordEncoder().encode("1234"))
+                .roles("C")
+                .build();
+
+        UserDetails user2 = User.builder()
+                .username("user2")
+                .password(bCryptPasswordEncoder().encode("1234"))
+                .roles("B")
+                .build();
+
+        UserDetails user3 = User.builder()
+                .username("user3")
+                .password(bCryptPasswordEncoder().encode("1234"))
+                .roles("A")
+                .build();
+
+
+        return new InMemoryUserDetailsManager(user1,user2,user3);
+
+    }
 
 }
